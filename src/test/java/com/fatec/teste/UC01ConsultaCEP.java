@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.IsNot.not;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -79,23 +80,24 @@ public class UC01ConsultaCEP {
 	
 	@Test
 	public void CT03ConsultaCEPcomLogradouroEmBranco() {
-		driver.get("http://www.buscacep.correios.com.br/sistemas/buscacep/buscaCep.cfm");		
+		driver.get("http://www.buscacep.correios.com.br/sistemas/buscacep/buscaCep.cfm");
+		driver.manage().window().setSize(new Dimension(1050, 708));
+		driver.findElement(By.name("UF")).click();
 		{
 			WebElement dropdown = driver.findElement(By.name("UF"));
 			dropdown.findElement(By.xpath("//option[. = 'SP']")).click();
 		}
-		espera();
+		driver.findElement(By.name("UF")).click();
+		driver.findElement(By.name("Localidade")).click();
 		driver.findElement(By.name("Localidade")).sendKeys("São Paulo");
+		driver.findElement(By.name("Tipo")).click();
 		{
 			WebElement dropdown = driver.findElement(By.name("Tipo"));
-			espera();
 			dropdown.findElement(By.xpath("//option[. = 'Rua']")).click();
 		}
 		driver.findElement(By.name("Tipo")).click();
-		driver.findElement(By.name("Logradouro")).sendKeys("blablkablablakbla");
 		driver.findElement(By.cssSelector(".btn2")).click();
-		espera();
-		assertThat(driver.findElement(By.cssSelector("p")).getText(), is("Informe o logradouro !"));
+		assertThat(driver.switchTo().alert().getText(), is("Informe o logradouro !"));
 	}
 	
 	//Logradouro com caracter especial
@@ -117,7 +119,15 @@ public class UC01ConsultaCEP {
 		driver.findElement(By.name("Logradouro")).sendKeys("!@#$%¨&*()");
 		driver.findElement(By.cssSelector(".btn2")).click();
 		espera();
-		assertThat(driver.findElement(By.cssSelector("p")).getText(), is("Logradouro não encontrado!"));
+		assertThat(driver.findElement(By.cssSelector("p")).getText(), is("LOGRADOURO NAO INFORMADO/INVALIDO"));
+	}
+	
+	@Test
+	public void CT06CamposEmBranco() {
+		driver.get("http://www.buscacep.correios.com.br/sistemas/buscacep/buscaCep.cfm");
+		driver.manage().window().setSize(new Dimension(1616, 876));
+		driver.findElement(By.cssSelector(".btn2")).click();
+		assertThat(driver.switchTo().alert().getText(), is("Selecione a UF !"));
 	}
 	
 	public void espera() {
